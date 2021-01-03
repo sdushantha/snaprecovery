@@ -59,7 +59,7 @@ COUNT=1
 
 for SNAP in .tmp/*; do
     EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
-    NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.0/$EXTENSION/g")
+    NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.[012]/$EXTENSION/g")
 
     # \r            Move cursor to the start of the current line
     # \e[<NUM>K     Move cursor up N lines   
