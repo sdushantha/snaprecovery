@@ -68,7 +68,7 @@ COUNT=1
 if [ -z "${MERGE:+x}" ]; then
     for SNAP in .tmp/*.chat_snap.[012]; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
-        NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.[012]/$EXTENSION/g")
+        NEW_FILENAME="${SNAP%chat_snap.[012]}$EXTENSION"
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
@@ -81,7 +81,7 @@ else # If MERGE is set, rename singletons and merge overlays
     # For files without overlays, rename with the correct extension
     for SNAP in .tmp/*.chat_snap.0; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
-        NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.0/$EXTENSION/g")
+        NEW_FILENAME="${SNAP%chat_snap.0}$EXTENSION"
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
