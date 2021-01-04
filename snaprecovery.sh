@@ -75,6 +75,9 @@ for SNAP in .tmp/*.chat_snap.1; do
     OVERLAY="${SNAP%1}2"
     NEW_FILENAME="${SNAP%chat_snap.1}mkv"
 
+    # if <name>.chat_snap.2 doesn't exist, don't attempt to merge anything
+    [ -f $OVERLAY ] || continue
+
     # \r            Move cursor to the start of the current line
     # \e[<NUM>K     Move cursor up N lines   
     printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
