@@ -57,7 +57,8 @@ mkdir -p "$SNAPS_DIRECTORY"
 TOTAL_FILES=$(find .tmp | wc -l | xargs)
 COUNT=1
 
-for SNAP in .tmp/*; do
+# For files without overlays, rename with the correct extension
+for SNAP in .tmp/*.chat_snap.0; do
     EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
     NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.0/$EXTENSION/g")
 
@@ -65,6 +66,25 @@ for SNAP in .tmp/*; do
     # \e[<NUM>K     Move cursor up N lines   
     printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
     mv "$SNAP" "$NEW_FILENAME"
+    COUNT=$((COUNT + 1))
+done
+
+# For files with overlays, use ffmpeg to merge the overlay
+for SNAP in .tmp/*.chat_snap.1; do
+    BASE="$SNAP"
+    OVERLAY="${SNAP%1}2"
+    NEW_FILENAME="${SNAP%chat_snap.1}mkv"
+
+    # \r            Move cursor to the start of the current line
+    # \e[<NUM>K     Move cursor up N lines   
+    printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+    
+    # merge overlay onto video
+    ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
+
+    # remove base, overlay, and unused JSON
+    rm -f $BASE $OVERLAY ${SNAP%chat_snap.1}json
+
     COUNT=$((COUNT + 1))
 done
 
