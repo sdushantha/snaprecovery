@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # by Siddharth Dushantha
 #
@@ -61,7 +61,7 @@ if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manag
 fi
 
 mkdir -p "$SNAPS_DIRECTORY"
-TOTAL_FILES=$(find .tmp | wc -l | xargs)
+TOTAL_FILES=$(find .tmp | wc -l)
 COUNT=1
 
 # If MERGE is unset, rename all files without merging
@@ -72,7 +72,7 @@ if [ -z "${MERGE:+x}" ]; then
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
@@ -85,7 +85,7 @@ else # If MERGE is set, rename singletons and merge overlays
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
@@ -101,7 +101,7 @@ else # If MERGE is set, rename singletons and merge overlays
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\e[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
         
         # merge overlay onto video
         ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
@@ -117,7 +117,7 @@ else # If MERGE is set, rename singletons and merge overlays
     done
 fi
 
-printf "\r\e[2K$GOOD %b\n" "Recoverd $TOTAL_FILES snaps"
+printf "\r\033[2K$GOOD %b\n" "Recoverd $TOTAL_FILES snaps"
 printf "$NOTICE %b\n" "The recovered snaps can be found in '$SNAPS_DIRECTORY'"
 
 mv .tmp/* "$SNAPS_DIRECTORY"
