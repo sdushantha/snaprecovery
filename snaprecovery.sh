@@ -21,10 +21,13 @@ EOF
 
 [ $# -eq 0 ] || [ "$1" = "" ] && usage
 
+# Determines whether or not to merge videos with overlays. Must be unset or null/empty to disable.
+MERGE=yes
+
 while [ "$1" ] ; do
     case $1 in
         -h|--help) usage ;;
-        -n|--no-merge) NO_MERGE=1 ;;
+        -n|--no-merge) unset MERGE ;;
         *) SERIAL="$1" ;;
     esac
     shift
@@ -32,7 +35,7 @@ done
 
 SNAPS_DIRECTORY="snaps_$SERIAL"
 
-for DEPENDENCY in curl adb; do
+for DEPENDENCY in curl adb ${MERGE:+ffmpeg}; do
     if ! command -v "$DEPENDENCY" >/dev/null 2>&1; then
         printf "$BAD %b\n" "Could not find '$DEPENDENCY', is it installed?"
         exit 1
@@ -58,8 +61,8 @@ mkdir -p "$SNAPS_DIRECTORY"
 TOTAL_FILES=$(find .tmp | wc -l | xargs)
 COUNT=1
 
-# If NO_MERGE is set, rename all files without merging
-if [ -n "$NO_MERGE" ]; then
+# If MERGE is unset, rename all files without merging
+if [ -z "${MERGE:+x}" ]; then
     for SNAP in .tmp/*.chat_snap.[012]; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
         NEW_FILENAME=$(echo "$SNAP" | sed "s/chat_snap\.[012]/$EXTENSION/g")
@@ -70,7 +73,7 @@ if [ -n "$NO_MERGE" ]; then
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
-else # If NO_MERGE is not set, rename singletons and merge overlays
+else # If MERGE is set, rename singletons and merge overlays
     # For files without overlays, rename with the correct extension
     for SNAP in .tmp/*.chat_snap.0; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
@@ -87,7 +90,7 @@ else # If NO_MERGE is not set, rename singletons and merge overlays
     for SNAP in .tmp/*.chat_snap.1; do
         BASE="$SNAP"
         OVERLAY="${SNAP%1}2"
-        NEW_FILENAME="${SNAP%chat_snap.1}mkv"
+        NEW_FILENAME="${SNAP%.chat_snap.1}.merged.mkv"
 
         # if <name>.chat_snap.2 doesn't exist, don't attempt to merge anything
         [ -f $OVERLAY ] || continue
