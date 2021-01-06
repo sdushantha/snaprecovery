@@ -97,21 +97,21 @@ else # If MERGE is set, rename singletons and merge overlays
         NEW_FILENAME="${SNAP%.chat_snap.1}.merged.mkv"
 
         # if <name>.chat_snap.2 doesn't exist, don't attempt to merge anything
-        [ -f $OVERLAY ] || continue
+        [ -f "$OVERLAY" ] || continue
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
         printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         
         # merge overlay onto video
-        ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
+        ffmpeg -loglevel quiet -i "$BASE" -i "$OVERLAY" -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy "$NEW_FILENAME"
 
         # adjust timestamp of new merged video to match base video
         TIMESTAMP="$(stat --format=%Y "$BASE")"
         touch -d "@$TIMESTAMP" "$NEW_FILENAME"
 
         # remove base, overlay, and unused JSON
-        rm -f $BASE $OVERLAY ${SNAP%chat_snap.1}json
+        rm -f "$BASE" "$OVERLAY" "${SNAP%chat_snap.1}json"
 
         COUNT=$((COUNT + 1))
     done
