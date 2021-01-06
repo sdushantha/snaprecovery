@@ -12,6 +12,7 @@ Recover old Snaps that have “disappeared” from Snapchat
 
 ## Dependencies
 - [`adb`](https://developer.android.com/studio/command-line/adb)
+- [`ffmpeg`](https://ffmpeg.org)
 
 This script was tested on an Android device running Android 10 with LinageOS with Snapchat v11.9.0.48 Beta
 
