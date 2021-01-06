@@ -73,6 +73,7 @@ if [ -z "${MERGE:+x}" ]; then
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
+    rm -f .tmp/*.json
 else # If MERGE is set, rename singletons and merge overlays
     # For files without overlays, rename with the correct extension
     for SNAP in .tmp/*.chat_snap.0; do
