@@ -40,23 +40,23 @@ SNAPS_DIRECTORY="snaps_$SERIAL"
 
 for DEPENDENCY in curl adb ${MERGE:+ffmpeg stat touch}; do
     if ! command -v "$DEPENDENCY" >/dev/null 2>&1; then
-        printf "$BAD %b\n" "Could not find '$DEPENDENCY', is it installed?"
+        printf "%b Could not find '%s', is it installed?\n" "$BAD" "$DEPENDENCY"
         exit 1
     fi
 done
 
 if ! PRODUCT_MODEL=$(adb -s "$SERIAL" shell getprop ro.product.model 2> /dev/null);then
-    printf "$BAD %b\n" "Looks like '$SERIAL' is an invalid device"
+    printf "%b Looks like '%s' is an invalid device\n" "$BAD" "$SERIAL"
     exit 1
 fi
 
-printf "$INFO %b\n" "Target device: $SERIAL ($PRODUCT_MODEL)"
+printf "%b Target device: %s (%s)\n" "$INFO" "$SERIAL" "$PRODUCT_MODEL"
 
 # Restart adb as root. Root access is needed in order to access the files
 adb -s "$SERIAL" root > /dev/null 2>&1
 
 if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
-    printf "$BAD %b\n" "This device is not rooted!"
+    printf "%b %b\n" "$BAD" "This device is not rooted!"
     exit 1
 fi
 
@@ -72,7 +72,7 @@ if [ -z "${MERGE:+x}" ]; then
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
@@ -85,7 +85,7 @@ else # If MERGE is set, rename singletons and merge overlays
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
@@ -101,7 +101,7 @@ else # If MERGE is set, rename singletons and merge overlays
 
         # \r            Move cursor to the start of the current line
         # \e[<NUM>K     Move cursor up N lines   
-        printf "\r\033[2K$RUNNING %b" "Recovering [$COUNT/$TOTAL_FILES]: $NEW_FILENAME"
+        printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         
         # merge overlay onto video
         ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
@@ -117,8 +117,8 @@ else # If MERGE is set, rename singletons and merge overlays
     done
 fi
 
-printf "\r\033[2K$GOOD %b\n" "Recoverd $TOTAL_FILES snaps"
-printf "$NOTICE %b\n" "The recovered snaps can be found in '$SNAPS_DIRECTORY'"
+printf "\r\033[2K%b Recovered %d snaps\n" "$GOOD" "$TOTAL_FILES"
+printf "%b The recovered snaps can be found in '%s'\n" "$NOTICE" "$SNAPS_DIRECTORY"
 
 mv .tmp/* "$SNAPS_DIRECTORY"
 rm -rf .tmp/
