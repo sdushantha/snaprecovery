@@ -12,9 +12,12 @@ NOTICE="\033[93;1m[!]\033[0m"
 
 usage(){
 cat <<EOF
-usage: snaprecovery [SERIAL]
+usage: snaprecovery [-n, --no-merge] [SERIAL]
 
 The serial number of the device can be found by running 'adb devices'
+
+Options:
+    -n, --no-merge    don't merge videos with their respective overlays
 EOF
     exit 1
 }
