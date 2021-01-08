@@ -71,7 +71,7 @@ if [ -z "${MERGE:+x}" ]; then
         NEW_FILENAME="${SNAP%chat_snap.[012]}$EXTENSION"
 
         # \r            Move cursor to the start of the current line
-        # \e[<NUM>K     Move cursor up N lines   
+        # \e[2K         Clear whole line
         printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
@@ -84,7 +84,7 @@ else # If MERGE is set, rename singletons and merge overlays
         NEW_FILENAME="${SNAP%chat_snap.0}$EXTENSION"
 
         # \r            Move cursor to the start of the current line
-        # \e[<NUM>K     Move cursor up N lines   
+        # \e[2K         Clear whole line
         printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
@@ -100,7 +100,7 @@ else # If MERGE is set, rename singletons and merge overlays
         [ -f "$OVERLAY" ] || continue
 
         # \r            Move cursor to the start of the current line
-        # \e[<NUM>K     Move cursor up N lines   
+        # \e[2K         Clear whole line
         printf "\r\033[2K%b Recovering [%d/%d]: %s" "$RUNNING" "$COUNT" "$TOTAL_FILES" "$NEW_FILENAME"
         
         # merge overlay onto video
