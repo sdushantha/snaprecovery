@@ -38,7 +38,7 @@ done
 
 SNAPS_DIRECTORY="snaps_$SERIAL"
 
-for DEPENDENCY in curl adb ${MERGE:+ffmpeg stat touch}; do
+for DEPENDENCY in adb ${MERGE:+ffmpeg stat touch}; do
     if ! command -v "$DEPENDENCY" >/dev/null 2>&1; then
         printf "%b Could not find '%s', is it installed?\n" "$BAD" "$DEPENDENCY"
         exit 1
