@@ -55,7 +55,7 @@ printf "$INFO %b\n" "Target device: $SERIAL ($PRODUCT_MODEL)"
 # Restart adb as root. Root access is needed in order to access the files
 adb -s "$SERIAL" root > /dev/null 2>&1
 
-if ! adb -s "$SERIAL" pull /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
+if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
     printf "$BAD %b\n" "This device is not rooted!"
     exit 1
 fi
