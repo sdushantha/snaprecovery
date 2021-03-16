@@ -106,6 +106,10 @@ else # If MERGE is set, rename singletons and merge overlays
         # merge overlay onto video
         ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
 
+        # adjust timestamp of new merged video to match base video
+        TIMESTAMP="$(stat --format=%Y "$BASE")"
+        touch -d "@$TIMESTAMP" "$NEW_FILENAME"
+
         # remove base, overlay, and unused JSON
         rm -f $BASE $OVERLAY ${SNAP%chat_snap.1}json
 
