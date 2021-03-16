@@ -38,7 +38,7 @@ done
 
 SNAPS_DIRECTORY="snaps_$SERIAL"
 
-for DEPENDENCY in curl adb ${MERGE:+ffmpeg}; do
+for DEPENDENCY in curl adb ${MERGE:+ffmpeg stat touch}; do
     if ! command -v "$DEPENDENCY" >/dev/null 2>&1; then
         printf "$BAD %b\n" "Could not find '$DEPENDENCY', is it installed?"
         exit 1
@@ -55,7 +55,7 @@ printf "$INFO %b\n" "Target device: $SERIAL ($PRODUCT_MODEL)"
 # Restart adb as root. Root access is needed in order to access the files
 adb -s "$SERIAL" root > /dev/null 2>&1
 
-if ! adb -s "$SERIAL" pull /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
+if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
     printf "$BAD %b\n" "This device is not rooted!"
     exit 1
 fi
@@ -105,6 +105,10 @@ else # If MERGE is set, rename singletons and merge overlays
         
         # merge overlay onto video
         ffmpeg -loglevel quiet -i $BASE -i $OVERLAY -filter_complex '[1:v][0:v]scale2ref[overlay][base]; [base][overlay]overlay' -c:a copy $NEW_FILENAME
+
+        # adjust timestamp of new merged video to match base video
+        TIMESTAMP="$(stat --format=%Y "$BASE")"
+        touch -d "@$TIMESTAMP" "$NEW_FILENAME"
 
         # remove base, overlay, and unused JSON
         rm -f $BASE $OVERLAY ${SNAP%chat_snap.1}json
