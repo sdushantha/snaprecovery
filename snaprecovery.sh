@@ -14,7 +14,8 @@ usage(){
 cat <<EOF
 usage: snaprecovery [-n, --no-merge] [SERIAL]
 
-The serial number of the device can be found by running 'adb devices'
+The serial number of the device can be found by running 'adb devices'.
+it is not necessary if only one device is connected in adb devices.
 
 Options:
     -n, --no-merge    don't merge videos with their respective overlays
@@ -22,7 +23,15 @@ EOF
     exit 1
 }
 
-[ $# -eq 0 ] || [ "$1" = "" ] && usage
+# int of the number of device connected to adb
+DEVICESCOUNT="$(adb devices | awk 'NF && NR>1' | wc -l)"
+
+# if only one device is connected, use it's serial. otherwise the user is required to specify a serial.
+if [ $DEVICESCOUNT -eq 1 ]; then
+    SERIAL="$(adb devices | awk 'NF && FNR==2{print $1}')"
+else
+    [ $# -eq 0 ] || [ "$1" = "" ] && usage
+fi
 
 # Determines whether or not to merge videos with overlays. Must be unset or null/empty to disable.
 MERGE=yes
