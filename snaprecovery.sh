@@ -49,7 +49,7 @@ done
 DEVICESTATUS="$(adb devices | grep $SERIAL | cut -f2)"
 if [ "$DEVICESTATUS" = 'unauthorized' ]; then
   printf "%b device '%s' is not authorized.\n" "$BAD" "$SERIAL"
-  printf "%b your computer is not authorized by your phone. check your phone maybe there is a pop up asking for authorization.\n" "$INFO" 
+  printf "%b your computer is not authorized by your phone. check your phone maybe there is a pop up asking for authorization.\n" "$NOTICE" 
   exit 1
 fi
 
