@@ -15,7 +15,7 @@ cat <<EOF
 usage: snaprecovery [-n, --no-merge] [SERIAL]
 
 The serial number of the device can be found by running 'adb devices'.
-it is not necessary if only one device is connected in adb devices.
+It is not necessary if only one device is connected in adb devices.
 
 Options:
     -n, --no-merge    don't merge videos with their respective overlays
@@ -23,10 +23,10 @@ EOF
     exit 1
 }
 
-# int of the number of device connected to adb
+# Number of devices connected to computer through USB
 DEVICESCOUNT="$(adb devices | awk 'NF && NR>1' | wc -l)"
 
-# if only one device is connected, use it's serial. otherwise the user is required to specify a serial.
+# If only one device is connected, use its serial, otherwise the user is required to specify a serial.
 if [ $DEVICESCOUNT -eq 1 ]; then
     SERIAL="$(adb devices | awk 'NF && FNR==2{print $1}')"
 else
