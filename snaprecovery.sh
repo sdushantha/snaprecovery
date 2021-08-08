@@ -45,6 +45,14 @@ while [ "$1" ] ; do
     shift
 done
 
+# Check if the device is authorized
+DEVICESTATUS="$(adb devices | grep $SERIAL | cut -f2)"
+if [ "$DEVICESTATUS" = 'unauthorized' ]; then
+  printf "%b device '%s' is not authorized.\n" "$BAD" "$SERIAL"
+  printf "%b your computer is not authorized by your phone. check your phone maybe there is a pop up asking for authorization.\n" "$INFO" 
+  exit 1
+fi
+
 SNAPS_DIRECTORY="snaps_$SERIAL"
 
 for DEPENDENCY in adb awk ${MERGE:+ffmpeg stat touch}; do
