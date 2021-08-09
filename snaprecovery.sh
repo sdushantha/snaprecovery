@@ -1,4 +1,4 @@
-#!/bin/sh
+!/bin/sh
 #
 # by Siddharth Dushantha
 #
@@ -48,8 +48,8 @@ done
 # Check if the device is authorized
 DEVICESTATUS="$(adb devices | grep $SERIAL | cut -f2)"
 if [ "$DEVICESTATUS" = 'unauthorized' ]; then
-  printf "%b device '%s' is not authorized.\n" "$BAD" "$SERIAL"
-  printf "%b your computer is not authorized by your phone. check your phone maybe there is a pop up asking for authorization.\n" "$NOTICE" 
+  printf "%b Device '%s' is not authorized.\n" "$BAD" "$SERIAL"
+  printf "%b Check for a confirmation dialog on your device.\n" "$NOTICE" 
   exit 1
 fi
 
