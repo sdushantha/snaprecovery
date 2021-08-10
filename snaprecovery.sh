@@ -23,15 +23,6 @@ EOF
     exit 1
 }
 
-# Number of devices connected to computer through USB
-DEVICESCOUNT="$(adb devices | awk 'NF && NR>1' | wc -l)"
-
-# If only one device is connected, use its serial, otherwise the user is required to specify a serial.
-if [ $DEVICESCOUNT -eq 1 ]; then
-    SERIAL="$(adb devices | awk 'NF && FNR==2{print $1}')"
-else
-    [ $# -eq 0 ] || [ "$1" = "" ] && usage
-fi
 
 # Determines whether or not to merge videos with overlays. Must be unset or null/empty to disable.
 MERGE=yes
@@ -45,15 +36,6 @@ while [ "$1" ] ; do
     shift
 done
 
-# Check if the device is authorized
-DEVICESTATUS="$(adb devices | grep $SERIAL | cut -f2)"
-if [ "$DEVICESTATUS" = 'unauthorized' ]; then
-  printf "%b Device '%s' is not authorized.\n" "$BAD" "$SERIAL"
-  printf "%b Check for a confirmation dialog on your device.\n" "$NOTICE" 
-  exit 1
-fi
-
-SNAPS_DIRECTORY="snaps_$SERIAL"
 
 for DEPENDENCY in adb awk ${MERGE:+ffmpeg stat touch}; do
     if ! command -v "$DEPENDENCY" >/dev/null 2>&1; then
@@ -62,6 +44,28 @@ for DEPENDENCY in adb awk ${MERGE:+ffmpeg stat touch}; do
     fi
 done
 
+# Number of devices connected to computer through USB
+DEVICESCOUNT="$(adb devices | awk 'NF && NR>1' | wc -l)"
+
+# If only one device is connected, use its serial, otherwise the user is required to specify a serial.
+if [ "$DEVICESCOUNT" -eq 1 ]; then
+    SERIAL="$(adb devices | awk 'NF && FNR==2{print $1}')"
+else
+    [ $# -eq 0 ] || [ "$1" = "" ] && usage
+fi
+
+SNAPS_DIRECTORY="snaps_$SERIAL"
+
+# Check if the device is authorized
+DEVICESTATUS="$(adb devices | grep "$SERIAL" | cut -f2)"
+if [ "$DEVICESTATUS" = 'unauthorized' ]; then
+  printf "%b Device '%s' is not authorized.\n" "$BAD" "$SERIAL"
+  printf "%b Check for a confirmation dialog on your device.\n" "$NOTICE" 
+  exit 1
+fi
+
+# Get the product model (e.g. SM-AF10F). If a product model is not found, then
+# that means the given serial is invalid.
 if ! PRODUCT_MODEL=$(adb -s "$SERIAL" shell getprop ro.product.model 2> /dev/null);then
     printf "%b Looks like '%s' is an invalid device\n" "$BAD" "$SERIAL"
     exit 1
@@ -94,7 +98,8 @@ if [ -z "${MERGE:+x}" ]; then
         COUNT=$((COUNT + 1))
     done
     rm -f .tmp/*.json
-else # If MERGE is set, rename singletons and merge overlays
+else
+    # If MERGE is set, rename singletons and merge overlays
     # For files without overlays, rename with the correct extension
     for SNAP in .tmp/*.chat_snap.0; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
