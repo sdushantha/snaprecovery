@@ -76,18 +76,18 @@ printf "%b Target device: %s (%s)\n" "$INFO" "$SERIAL" "$PRODUCT_MODEL"
 # Restart adb as root. Root access is needed in order to access the files
 adb -s "$SERIAL" root > /dev/null 2>&1
 
-if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .tmp > /dev/null 2>&1; then
+if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .snaprecovery-tmp > /dev/null 2>&1; then
     printf "%b %b\n" "$BAD" "This device is not rooted!"
     exit 1
 fi
 
 mkdir -p "$SNAPS_DIRECTORY"
-TOTAL_FILES=$(find .tmp | wc -l)
+TOTAL_FILES=$(find .snaprecovery-tmp | wc -l)
 COUNT=1
 
 # If MERGE is unset, rename all files without merging
 if [ -z "${MERGE:+x}" ]; then
-    for SNAP in .tmp/*.chat_snap.[012]; do
+    for SNAP in .snaprecovery-tmp/*.chat_snap.[012]; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
         NEW_FILENAME="${SNAP%chat_snap.[012]}$EXTENSION"
 
@@ -97,11 +97,11 @@ if [ -z "${MERGE:+x}" ]; then
         mv "$SNAP" "$NEW_FILENAME"
         COUNT=$((COUNT + 1))
     done
-    rm -f .tmp/*.json
+    rm -f .snaprecovery-tmp/*.json
 else
     # If MERGE is set, rename singletons and merge overlays
     # For files without overlays, rename with the correct extension
-    for SNAP in .tmp/*.chat_snap.0; do
+    for SNAP in .snaprecovery-tmp/*.chat_snap.0; do
         EXTENSION=$(file --mime-type -b "$SNAP" | sed 's/.*\///g')
         NEW_FILENAME="${SNAP%chat_snap.0}$EXTENSION"
 
@@ -113,7 +113,7 @@ else
     done
 
     # For files with overlays, use ffmpeg to merge the overlay
-    for SNAP in .tmp/*.chat_snap.1; do
+    for SNAP in .snaprecovery-tmp/*.chat_snap.1; do
         BASE="$SNAP"
         OVERLAY="${SNAP%1}2"
         NEW_FILENAME="${SNAP%.chat_snap.1}.merged.mkv"
@@ -142,6 +142,6 @@ fi
 printf "\r\033[2K%b Recovered %d snaps\n" "$GOOD" "$TOTAL_FILES"
 printf "%b The recovered snaps can be found in '%s'\n" "$NOTICE" "$SNAPS_DIRECTORY"
 
-mv .tmp/* "$SNAPS_DIRECTORY"
-rm -rf .tmp/
+mv .snaprecovery-tmp/* "$SNAPS_DIRECTORY"
+rm -rf .snaprecovery-tmp/
 
