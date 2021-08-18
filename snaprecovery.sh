@@ -78,10 +78,10 @@ adb -s "$SERIAL" root > /dev/null 2>&1
 
 if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ .snaprecovery-tmp > /dev/null 2>&1; then
     if adb shell [ -d /data/user/0/com.snapchat.android/files/file_manager/chat_snap/ ]; then
-	printf "%b %b\n" "$BAD" "This device is not rooted!"
-    	exit 1
+        printf "%b %b\n" "$BAD" "This device is not rooted!"
+        exit 1
     else
-	printf "%b %b\n" "$BAD" "Snapchat is not installed on this device!"
+        printf "%b %b\n" "$BAD" "Snapchat is not installed on this device!"
         exit 1
     fi
 fi
