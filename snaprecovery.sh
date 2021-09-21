@@ -82,7 +82,7 @@ if ! adb -s "$SERIAL" pull -a /data/user/0/com.snapchat.android/files/file_manag
 fi
 
 mkdir -p "$SNAPS_DIRECTORY"
-TOTAL_FILES=$(find .snaprecovery-tmp | wc -l)
+TOTAL_FILES=$(find .snaprecovery-tmp -mindepth 1 | wc -l)
 COUNT=1
 
 # If MERGE is unset, rename all files without merging
