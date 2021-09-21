@@ -16,6 +16,8 @@ Recover old Snaps that have “disappeared” from Snapchat
 
 This script was tested on an Android device running Android 10 with LinageOS with Snapchat v11.9.0.48 Beta
 
+**Notice: Snapchat has seemed to patched this _vulnerability_ without any notice. I reported this issue to them through HackerOne but it was out of scope because I used a rooted devices and what I reported was a "sreenshot detection avoidance", which is also out of scope.**
+
 ## How the recovery works
 According to Snap Inc's [blog post](https://www.snap.com/en-US/news/post/how-snaps-are-stored-and-deleted) from 9 May 2013, Snaps are deleted once you have viewed them.
 
